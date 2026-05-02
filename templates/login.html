@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Login - HardStock{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <img src="/static/im.png" alt="HardStock Logo" class="setup-logo">
+        <h1>HardStock</h1>
+        <p>Enter your password to access the system</p>
+        
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="/login">
+            <input type="password" name="password" placeholder="Owner Password" required autofocus>
+            <button type="submit">Login</button>
+        </form>
+        
+        <div class="recovery-link">
+            <a href="/recover-password">Forgot password?</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Products - HardStock{% endblock %}
+
+{% block content %}
+<div class="products-container">
+    <h1>Products Management</h1>
+    
+    <!-- Summary Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">{{ total_quantity }}</div>
+            <div class="stat-label">Total Items in Stock</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value">GH₵ {{ "{:,.2f}".format(total_value) }}</div>
+            <div class="stat-label">Total Stock Value</div>
+        </div>
+    </div>
+    
+    <!-- Add Product Form -->
+    <div class="form-card">
+        <h2>Add New Product</h2>
+        <form method="post" action="/add-product" class="product-form">
+            <input type="text" name="product_name" placeholder="Product Name" required>
+            <select name="category_id" required>
+                <option value="">Select Category</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="price" step="0.01" placeholder="Price (GH)" required>
+            <input type="number" name="quantity" placeholder="Initial Quantity" required>
+            <button type="submit">Add Product</button>
+        </form>
+    </div>
+    
+    <!-- Products List -->
+    <div class="section-card">
+        <h2>All Products</h2>
+        {% if products %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Price (GH)</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category_name }}</td>
+                    <td>GH₵ {{ "{:,.2f}".format(product.price) }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>
+                        {% if product.quantity < 5 %}
+                        <span class="status-critical">⚠️ CRITICAL</span>
+                        {% elif product.quantity < 10 %}
+                        <span class="status-low">⚠️ Low</span>
+                        {% else %}
+                        <span class="status-good">✓ In Stock</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <button onclick="editProduct({{ product.id }}, '{{ product.name }}', {{ product.category_id }}, {{ product.price }}, {{ product.quantity }})" 
+                                class="btn-edit">Edit</button>
+                        <form method="post" action="/delete-product/{{ product.id }}" 
+                              onsubmit="return confirm('Delete this product?')" style="display:inline">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No products yet. Add your first product above!</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div id="editModal" class="modal" style="display:none">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Edit Product</h2>
+        <form method="post" id="editForm">
+            <input type="text" name="product_name" id="edit_name" required>
+            <select name="category_id" id="edit_category" required>
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="number" name="price" step="0.01" id="edit_price" required>
+            <input type="number" name="quantity" id="edit_quantity" required>
+            <button type="submit">Update Product</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function editProduct(id, name, categoryId, price, quantity) {
+        document.getElementById('edit_name').value = name;
+        document.getElementById('edit_category').value = categoryId;
+        document.getElementById('edit_price').value = price;
+        document.getElementById('edit_quantity').value = quantity;
+        document.getElementById('editForm').action = '/edit-product/' + id;
+        document.getElementById('editModal').style.display = 'block';
+    }
+    
+    function closeModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success')) alert('✓ ' + urlParams.get('success'));
+    if (urlParams.get('error')) alert('✗ ' + urlParams.get('error'));
+</script>
+{% endblock %}

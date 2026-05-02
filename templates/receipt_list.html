@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt List - HardStock{% endblock %}
+
+{% block content %}
+<div class="receipt-list-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1>📋 Receipt Management</h1>
+        <div>
+            <a href="/receipt-deletion-logout" class="btn-logout" style="background: #95a5a6;">Exit Management</a>
+        </div>
+    </div>
+    
+    {% if success_message %}
+    <div class="success-message">{{ success_message }}</div>
+    {% endif %}
+    
+    <div class="section-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>All Receipts</h2>
+            <form method="post" action="/delete-all-receipts" 
+      onsubmit="return confirm('⚠️ DANGER: This will PERMANENTLY DELETE ALL receipts! This action cannot be undone and product quantities will NOT be restored. Are you absolutely sure?')">
+    <button type="submit" class="btn-danger" style="background: #e74c3c;">🗑️ Delete All Receipts</button>
+</form>
+        </div>
+        
+        {% if receipts %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Receipt #</th>
+                        <th>Date</th>
+                        <th>Customer</th>
+                        <th>Company</th>
+                        <th>Items</th>
+                        <th>Total Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in receipts %}
+                    <tr>
+                        <td>#{{ receipt.id }}</td>
+                        <td>{{ receipt.sale_date[:19] if receipt.sale_date else 'N/A' }}</td>
+                        <td>{{ receipt.customer_name or 'Walk-in' }}</td>
+                        <td>{{ receipt.customer_company or '-' }}</td>
+                        <td>{{ receipt.item_count }}</td>
+                        <td>GH₵ {{ "{:,.2f}".format(receipt.total_amount) }}</td>
+                        <td>
+                            <a href="/receipt/{{ receipt.id }}" target="_blank" class="btn-edit">View</a>
+                            <form method="post" action="/delete-receipt/{{ receipt.id }}" 
+      onsubmit="return confirm('⚠️ PERMANENT DELETE: Receipt #{{ receipt.id }} will be permanently deleted. This action cannot be undone. Continue?')" 
+      style="display: inline;">
+    <button type="submit" class="btn-danger">Delete</button>
+</form>
+                         </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No receipts found.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .receipt-list-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    .btn-logout {
+        padding: 10px 20px;
+        background: #2c3e50;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+    }
+    .btn-danger {
+        padding: 5px 10px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .btn-edit {
+        padding: 5px 10px;
+        background: #3498db;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        display: inline-block;
+        margin-right: 5px;
+    }
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+    .table-responsive {
+        overflow-x: auto;
+    }
+</style>
+{% endblock %}

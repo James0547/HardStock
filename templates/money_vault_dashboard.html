@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Money Vault Dashboard - HardStock{% endblock %}
+
+{% block content %}
+<div class="vault-container">
+    <div class="vault-header">
+        <h1>💰 Money Vault Dashboard</h1>
+        <a href="/money-vault/logout" class="btn-logout">Exit Vault</a>
+    </div>
+    
+    <!-- Financial Summary -->
+    <div class="stats-grid">
+        <div class="stat-card vault-stat">
+            <div class="stat-icon">💵</div>
+            <div class="stat-value">GH₵ {{ "{:,.2f}".format(totals.total_revenue) }}</div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+        
+        <div class="stat-card vault-stat">
+            <div class="stat-icon">📊</div>
+            <div class="stat-value">{{ totals.total_transactions }}</div>
+            <div class="stat-label">Total Transactions</div>
+        </div>
+    </div>
+    
+    <!-- Category Breakdown -->
+    <div class="section-card">
+        <h2>Sales by Category</h2>
+        {% if category_totals and category_totals|length > 0 %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Total Sales</th>
+                    <th>Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cat in category_totals %}
+                <tr>
+                    <td>{{ cat.category_name }}</td>
+                    <td>GH₵ {{ "{:,.2f}".format(cat.total) }}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ (cat.total / totals.total_revenue * 100) if totals.total_revenue > 0 else 0 }}%">
+                                {{ "%.1f"|format((cat.total / totals.total_revenue * 100) if totals.total_revenue > 0 else 0) }}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No sales data available.</p>
+        {% endif %}
+    </div>
+    
+    <!-- All Transactions Grouped by Receipt -->
+    <div class="section-card">
+        <h2>All Financial Transactions</h2>
+        {% if grouped_transactions and grouped_transactions|length > 0 %}
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Receipt #</th>
+                        <th>Customer</th>
+                        <th>Items</th>
+                        <th>Total Amount</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in grouped_transactions %}
+                    <tr class="receipt-row" onclick="toggleDetails({{ receipt.sale_id }})" style="cursor: pointer;">
+                        <td><strong>{{ receipt.date }}</strong><br><small>{{ receipt.time }}</small></td>
+                        <td><strong>#{{ receipt.sale_id }}</strong></td>
+                        <td>{{ receipt.customer_name }}{% if receipt.customer_company %}<br><small>{{ receipt.customer_company }}</small>{% endif %}</td>
+                        <td>{{ receipt.item_count }} item(s)</td>
+                        <td class="amount"><strong>GH₵ {{ "{:,.2f}".format(receipt.total_amount) }}</strong></td>
+                        <td>
+                            <button onclick="event.stopPropagation(); window.open('/receipt/{{ receipt.sale_id }}', '_blank')" class="btn-edit">View Receipt</button>
+                        </td>
+                    </tr>
+                    <tr id="details-{{ receipt.sale_id }}" style="display: none;" class="details-row">
+                        <td colspan="6">
+                            <div class="details-container">
+                                <table class="details-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                            <th>Quantity</th>
+                                            <th>Unit Price</th>
+                                            <th>Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if receipt.product_items and receipt.product_items|length > 0 %}
+                                            {% for product in receipt.product_items %}
+                                            <tr>
+                                                <td>{{ product.product_name }}</td>
+                                                <td>{{ product.category_name }}</td>
+                                                <td>{{ product.quantity }}</td>
+                                                <td>GH₵ {{ "{:,.2f}".format(product.unit_price) }}</td>
+                                                <td>GH₵ {{ "{:,.2f}".format(product.total_price) }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="5">No product items found</td>
+                                            </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p>No transactions recorded yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .receipt-row:hover {
+        background-color: rgba(255,255,255,0.1);
+        cursor: pointer;
+    }
+    
+    .details-row {
+        background-color: rgba(0,0,0,0.2);
+    }
+    
+    .details-container {
+        padding: 15px;
+        margin: 0;
+    }
+    
+    .details-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+    
+    .details-table th,
+    .details-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    
+    .details-table th {
+        background-color: rgba(0,0,0,0.3);
+        font-weight: bold;
+    }
+    
+    .btn-edit {
+        background-color: #3498db;
+        color: white;
+        padding: 5px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    
+    .btn-edit:hover {
+        background-color: #2980b9;
+    }
+    
+    .vault-container .data-table td,
+    .vault-container .data-table th {
+        padding: 12px;
+    }
+    
+    .amount {
+        font-weight: bold;
+        color: #2ecc71;
+    }
+</style>
+
+<script>
+    function toggleDetails(saleId) {
+        const detailsRow = document.getElementById(`details-${saleId}`);
+        if (detailsRow.style.display === 'none' || detailsRow.style.display === '') {
+            detailsRow.style.display = 'table-row';
+        } else {
+            detailsRow.style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

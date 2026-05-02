@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Categories - HardStock{% endblock %}
+
+{% block content %}
+<div class="categories-container">
+    <h1>Product Categories</h1>
+    
+    <!-- Add Category Form -->
+    <div class="form-card">
+        <h2>Add New Category</h2>
+        <form method="post" action="/add-category" class="inline-form">
+            <input type="text" name="category_name" placeholder="Category Name (e.g., Tools, Paint, Plumbing)" required>
+            <button type="submit">Add Category</button>
+        </form>
+    </div>
+    
+    <!-- Categories List -->
+    <div class="section-card">
+        <h2>All Categories</h2>
+        {% if categories %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Created Date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr>
+                    <td>{{ category.name }}</td>
+                    <td>{{ category.created_at[:19] if category.created_at else 'N/A' }}</td>
+                    <td>
+                        <form method="post" action="/delete-category/{{ category.id }}" 
+                              onsubmit="return confirm('Delete this category? Products in it will be affected.')">
+                            <button type="submit" class="btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No categories yet. Add your first category above!</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    // Show success/error messages from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('success')) {
+        alert('✓ ' + urlParams.get('success'));
+    }
+    if (urlParams.get('error')) {
+        alert('✗ ' + urlParams.get('error'));
+    }
+</script>
+{% endblock %}

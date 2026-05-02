@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Register Your Shop{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <h1>Register Your Hardware Shop</h1>
+        <p>Enter your shop details to get started</p>
+        
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="/register-shop">
+            <input type="text" name="shop_name" placeholder="Shop Name" value="{{ shop_name or '' }}" required>
+            <input type="text" name="location" placeholder="Shop Location" value="{{ location or '' }}" required>
+            <input type="tel" name="phone" placeholder="Phone Number" value="{{ phone or '' }}" required>
+            <input type="password" name="owner_password" placeholder="Create Owner Password" required>
+            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
+            <button type="submit">Register & Continue</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - HardStock{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h1>Dashboard</h1>
+    
+    <!-- Shop Info -->
+    <div class="shop-info-card">
+        <h2>{{ shop.shop_name }}</h2>
+        <p>📍 {{ shop.location }} | 📞 {{ shop.phone }}</p>
+    </div>
+    
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📦</div>
+            <div class="stat-value">{{ total_products }}</div>
+            <div class="stat-label">Total Products in Stock</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📁</div>
+            <div class="stat-value">{{ total_categories }}</div>
+            <div class="stat-label">Categories</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-value">GH₵ {{ "{:,.2f}".format(today_sales) }}</div>
+            <div class="stat-label">Today's Sales</div>
+        </div>
+    </div>
+    
+    <!-- Low Stock Alert -->
+    <div class="section-card">
+        <h2>⚠️ Low Stock Alert</h2>
+        {% if low_stock %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Category</th>
+                    <th>Current Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.category_name }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td><span class="status-low">⚠️ Low Stock</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="success-message">✅ All products have sufficient stock!</p>
+        {% endif %}
+    </div>
+    
+    <!-- Recent Sales -->
+    <div class="section-card">
+        <h2>🕐 Recent Transactions</h2>
+        {% if recent_sales %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Customer</th>
+                    <th>Total Amount</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in recent_sales %}
+                <tr>
+                    <td>{{ sale.sale_date[:19] }}</td>
+                    <td>{{ sale.customer_name or 'Walk-in Customer' }}</td>
+                    <td>GH₵ {{ "{:,.2f}".format(sale.total_amount) }}</td>
+                    <td><a href="/receipt/{{ sale.id }}" target="_blank">View Receipt</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No sales yet. Start selling!</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}HardStock - Setup{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <img src="/static/im.png" alt="HardStock Logo" class="setup-logo">
+        <h1>HardStock Setup</h1>
+        <p>Please enter the developer password to continue</p>
+        
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="/verify-setup">
+            <input type="password" name="password" placeholder="Developer Password" required>
+            <button type="submit">Verify & Continue</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

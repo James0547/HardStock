@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - HardStock{% endblock %}
+
+{% block content %}
+<div class="reports-container">
+    <h1>Sales Reports</h1>
+    
+    <div class="report-buttons">
+        <button onclick="loadReport('daily')" class="report-btn">📅 Daily Report</button>
+        <button onclick="loadReport('weekly')" class="report-btn">📊 Weekly Report</button>
+        <button onclick="loadReport('monthly')" class="report-btn">📈 Monthly Report</button>
+        <button onclick="loadReport('yearly')" class="report-btn">🎯 Yearly Report</button>
+    </div>
+
+    <div class="export-buttons" style="margin-bottom: 20px;">
+    <button onclick="exportSales()" class="btn-export">📊 Export Sales to Excel</button>
+    <button onclick="exportProducts()" class="btn-export">📦 Export Products to Excel</button>
+</div>
+
+<style>
+    .btn-export {
+        background: #27ae60;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    .btn-export:hover {
+        background: #229954;
+    }
+</style>
+
+<script>
+    function exportSales() {
+        window.location.href = '/export/sales';
+    }
+    
+    function exportProducts() {
+        window.location.href = '/export/products';
+    }
+</script>
+    
+    <div id="reportContent" class="report-content">
+        <p>Select a report period above</p>
+    </div>
+</div>
+
+<script>
+    async function loadReport(period) {
+        const reportDiv = document.getElementById('reportContent');
+        reportDiv.innerHTML = '<div class="loading">Loading report...</div>';
+        
+        try {
+            const response = await fetch(`/api/sales-report?period=${period}`);
+            const data = await response.json();
+            
+            let html = `
+                <div class="report-summary">
+                    <h2>${period.toUpperCase()} Sales Report</h2>
+                    <div class="report-stats">
+                        <div class="report-stat">
+                            <strong>Total Sales:</strong> GH ${parseFloat(data.totals.total_sales).toFixed(2)}
+                        </div>
+                        <div class="report-stat">
+                            <strong>Total Transactions:</strong> ${data.totals.total_transactions}
+                        </div>
+                    </div>
+            `;
+            
+            if (data.category_sales && data.category_sales.length > 0) {
+                html += `
+                    <h3>Sales by Category</h3>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Category</th><th>Total</th><th>Percentage</th></tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                for (const cat of data.category_sales) {
+                    const percentage = (cat.total / data.totals.total_sales * 100).toFixed(1);
+                    html += `
+                        <tr>
+                            <td>${cat.category_name}</td>
+                            <td>GH ${parseFloat(cat.total).toFixed(2)}</td>
+                            <td>${percentage}%</td>
+                        </tr>
+                    `;
+                }
+                
+                html += `</tbody></table>`;
+            }
+            
+            if (data.sales && data.sales.length > 0) {
+                html += `
+                    <h3>Transaction Details</h3>
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Customer</th>
+                                    <th>Items</th>
+                                    <th>Total</th>
+                                    <th>Receipt</th>
+                                 </tr>
+                            </thead>
+                            <tbody>
+                `;
+                
+                for (const sale of data.sales) {
+                    html += `
+                        <tr>
+                            <td>${sale.sale_date.slice(0, 19)}</td>
+                            <td>${sale.customer_name || 'Walk-in'}</td>
+                            <td>${sale.items || '-'}</td>
+                            <td>GH ${parseFloat(sale.total_amount).toFixed(2)}</td>
+                            <td><a href="/receipt/${sale.id}" target="_blank">View</a></td>
+                        </tr>
+                    `;
+                }
+                
+                html += `</tbody></table></div>`;
+            } else {
+                html += `<p>No sales records for this period.</p>`;
+            }
+            
+            html += `</div>`;
+            reportDiv.innerHTML = html;
+            
+        } catch (error) {
+            console.error('Error:', error);
+            reportDiv.innerHTML = '<div class="error-message">Error loading report. Please try again.</div>';
+        }
+    }
+    
+    // Load daily report by default
+    loadReport('daily');
+</script>
+{% endblock %}

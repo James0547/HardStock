@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Backup Complete - HardStock{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <div class="success-icon" style="font-size: 60px; margin-bottom: 20px;">✅</div>
+        <h1>Backup Complete!</h1>
+        <p>Your database has been successfully backed up.</p>
+        
+        <div class="backup-info" style="background: #f0f0f0; padding: 15px; border-radius: 8px; margin: 20px 0;">
+            <p><strong>Backup File:</strong> {{ backup_file }}</p>
+            <p><strong>Location:</strong> Downloads Folder</p>
+        </div>
+        
+        <div class="button-group">
+            <a href="/dashboard" class="btn-edit">Go to Dashboard</a>
+            <button onclick="openDownloads()" class="btn-export">Open Downloads Folder</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .button-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+    .btn-export {
+        background: #27ae60;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+    }
+</style>
+
+<script>
+    function openDownloads() {
+        // This will help user locate the backup file
+        alert('Backup file is saved in your Downloads folder.\nFile: {{ backup_file }}');
+        window.location.href = '/dashboard';
+    }
+</script>
+{% endblock %}

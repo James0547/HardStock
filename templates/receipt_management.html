@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt Management - HardStock{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <h1>🗑️ Receipt Management</h1>
+        <p class="warning" style="color: red; margin-bottom: 20px;">
+            ⚠️ WARNING: This area allows you to delete receipts. Deleted receipts cannot be recovered!
+        </p>
+        
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        {% if success_message %}
+        <div class="success-message">{{ success_message }}</div>
+        {% endif %}
+        
+        <form method="post" action="/verify-receipt-password">
+            <input type="password" name="password" placeholder="Enter Owner Password to Continue" required autofocus>
+            <button type="submit">Verify & Continue</button>
+        </form>
+        
+        <div class="back-link" style="margin-top: 20px; text-align: center;">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

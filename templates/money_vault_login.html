@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Money Vault - HardStock{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card vault-card">
+        <div class="vault-icon">💰</div>
+        <h1>Money Vault</h1>
+        <p>Secure area for financial records</p>
+        <p class="warning">⚠️ This area contains all sales and revenue data</p>
+        
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="/money-vault/verify">
+            <input type="password" name="password" placeholder="Vault Password" required autofocus>
+            <button type="submit">Access Vault</button>
+        </form>
+        
+        <div class="recovery-link">
+            <a href="/recover-password">Forgot Vault Password?</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

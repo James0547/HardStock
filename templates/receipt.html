@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Receipt - HardStock{% endblock %}
+
+{% block content %}
+<div class="receipt-container" id="receipt">
+    <div class="receipt">
+        <div class="receipt-header">
+            {% if shop %}
+            <h2>{{ shop.shop_name }}</h2>
+            <p>{{ shop.location }}</p>
+            <p>Tel: {{ shop.phone }}</p>
+            {% else %}
+            <h2>HardStock Hardware</h2>
+            {% endif %}
+            <p>--------------------------------</p>
+            <p><strong>Receipt #: {{ sale.id }}</strong></p>
+            <p>Date: {{ sale.sale_date[:19] }}</p>
+            <p>Customer: {{ sale.customer_name or 'Walk-in Customer' }}</p>
+            {% if sale.customer_company %}
+            <p>Company: {{ sale.customer_company }}</p>
+            {% endif %}
+            <p>--------------------------------</p>
+        </div>
+        
+        <div class="receipt-items">
+            <table class="receipt-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.product_name }}<br><small>{{ item.category_name }}</small></td>
+                        <td>{{ item.quantity }}</td>
+                        <td>GH₵ {{ "%.2f"|format(item.unit_price) }}</td>
+                        <td>GH₵ {{ "%.2f"|format(item.total_price) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="receipt-footer">
+            <p>--------------------------------</p>
+            <p><strong>Total Items:</strong> {{ total_quantity }}</p>
+            <p><strong>Subtotal:</strong> GH₵ {{ "%.2f"|format(sale.total_amount) }}</p>
+            <p><strong>TOTAL:</strong> GH₵ {{ "%.2f"|format(sale.total_amount) }}</p>
+            <p>--------------------------------</p>
+            <p>Thank you for shopping with us!</p>
+            <p>HardStock - Quality Hardware</p>
+        </div>
+    </div>
+</div>
+
+<div class="receipt-actions">
+    <button onclick="window.print()" class="btn-print">🖨️ Print Receipt</button>
+    <button onclick="window.location.href='/pos'" class="btn-new-sale">➕ New Sale</button>
+</div>
+
+<script>
+    if (window.location.search.includes('print=true')) {
+        window.print();
+    }
+</script>
+
+<style>
+    .receipt-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .receipt-table th, .receipt-table td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+    .receipt-footer {
+        margin-top: 15px;
+        text-align: right;
+    }
+</style>
+{% endblock %}

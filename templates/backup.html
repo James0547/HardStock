@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Backup System - HardStock{% endblock %}
+
+{% block content %}
+<div class="setup-container">
+    <div class="setup-card">
+        <h1>💾 Database Backup</h1>
+        <p>Enter your owner password to create a backup</p>
+        <p class="warning" style="color: #f39c12;">
+            ⚠️ Backup will be saved to your Downloads folder
+        </p>
+        
+        {% if error %}
+        <div class="error-message">{{ error }}</div>
+        {% endif %}
+        
+        <form method="post" action="/verify-backup-password">
+            <input type="password" name="password" placeholder="Owner Password" required autofocus>
+            <button type="submit">Create Backup</button>
+        </form>
+        
+        <div class="back-link" style="margin-top: 20px; text-align: center;">
+            <a href="/dashboard">Back to Dashboard</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

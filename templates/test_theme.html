@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        body.dark-mode {
+            background: #1a1a2e;
+            color: white;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        body.dark-mode .card {
+            background: #0f3460;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Theme Test</h1>
+    <button onclick="toggleTheme()">Toggle Dark/Light Mode</button>
+    <div class="card">
+        <p>This is a test card. If dark mode works, this card changes color!</p>
+    </div>
+    
+    <script>
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        }
+        
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>
